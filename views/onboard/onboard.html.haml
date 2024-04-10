@@ -1,0 +1,501 @@
+!!!
+%html
+  %head
+    %meta{content: "width=device-width, initial-scale=1", name: "viewport"}
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}
+    %title Customer Details
+    :css
+      body 
+        {
+          font-family: Arial, sans-serif;
+          background-color: #f8f8f8;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+        }
+    
+        .container {
+          width: 75%;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #fff;
+          border-radius: 5px;
+          box-shadow: -2px 4px 4px 0px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+          max-height: 80vh;
+          overflow-y: auto;
+        }
+    
+        .form-container {
+          overflow: hidden;
+        }
+    
+        h1 {
+          color: #333;
+          margin-bottom: 5px;
+        }
+    
+        .form-group {
+          margin-bottom: 10px;
+        }
+    
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+    
+        input[type="text"],
+        input[type="submit"] {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+    
+        input[type="submit"] {
+          background-color: #007bff;
+          color: white;
+          cursor: pointer;
+        }
+    
+        input[type="submit"]:hover {
+          background-color: #0056b3;
+        }
+    
+        .list-view-border {
+          overflow: hidden;
+        }
+         
+        .top_nav{
+          display: flex;
+          justify-content: space-between;
+          background-color:#1e1e2d;
+          color:#c0c4d1;
+          height:70px;
+          font-size: 1rem;
+          font-weight:500;
+          align-items:center;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .user-label {
+          color: #f8f9fa; 
+          font-weight: bold;
+          margin-left: 5px; 
+          margin-right: 10px; 
+        }
+      
+        label.required::after{
+          content: "*";
+          color: red;
+          margin-left: 2px;
+          font-size: 20px;
+        }
+        .logo {
+          height: 100%;
+          margin-right: 10px;
+        }
+
+        .success-message-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: white;
+          text-align: center;
+          z-index: 9999;
+        }
+        
+        .success-message-overlay p {
+          margin-top: 20%;
+          font-size: 24px;
+        }
+        select.form-control {
+          height: 30px; 
+          width: 400px; 
+        }
+        .results {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .capture-field{
+          flex: 1; 
+          margin: 0 10px;}
+
+        .capture-fields-container{
+          display: flex;
+          justify-content: space-between; 
+        }
+
+        .results &gt; div {
+          width: 33%;
+          text-align: center;
+          line-height: 24px;
+        }
+
+        @media (max-width: 814px) {
+          .results {
+            flex-flow: column;
+          }
+          .results &gt; div {
+            width: 100%;
+            margin-bottom: 24px;
+          }
+        }
+  %body
+    .top_nav
+      = image_tag('Happy-Tide.png', class: 'logo')
+      %label.animation.user-label Hello..
+    .container#customer-details-container
+      %h1#customer-details-heading Loan Application Request Form
+      #results
+        .capture-fields-container
+          .capture-field#selfie-field
+            %h3 Selfie
+            %button.capture-button.big-button{ style: "background-color: #d8bfd8; width: 200px; height: 50px; font-size: 20px; border-radius: 10px; border: 3px; font-weight: bold; color: purple; transition: background-color 0.5s;", onmouseover: "this.style.backgroundColor='blue'", onmouseout: "this.style.backgroundColor=' #d8bfd8'" } Selfie
+            %video#video-element{autoplay: "", style: "width: 100%; max-width: 300px; height: auto; margin: 10px auto 10px 0; display: none;"}
+            %canvas.captured-image{style: "display: none; margin-top: 10px;width: 100%; max-width: 300px; height: auto; max-height:300px"}
+          .capture-field#shop-photo-field
+            %h3 Shop Photo
+            %button.capture-button.big-button{ style: "background-color: #d8bfd8; width: 200px; height: 50px; font-size: 20px; border-radius: 10px; border: 3px; font-weight: bold; color: purple; transition: background-color 0.5s;", onmouseover: "this.style.backgroundColor='blue'", onmouseout: "this.style.backgroundColor=' #d8bfd8'" } Shop Photo
+            %video#video-element{autoplay: "", style: "width: 100%; max-width: 300px; height: auto; margin: 10px auto 10px 0; display: none;"}
+            %canvas.captured-image{style: "display: none; margin-top: 10px;width: 100%; max-width: 300px; height: auto; max-height:300px"}
+      .form-container
+        = form_with(model: @customer_lead, url: onboard_create_path, method: :post,id: 'new_customer_lead_form') do |form|
+          %br
+          .form-group
+            = form.label :first_name, 'First Name', class: 'required'
+            = form.text_field :first_name, required: true, class: 'form-control'
+          .form-group
+            = form.label :last_name, 'Last Name', class: 'required'
+            = form.text_field :last_name, required: true, class: 'form-control'
+          .form-group
+            = form.label :guardian_name, 'Guardain Name', class: 'required'
+            = form.text_field :guardian_name, required: true, class: 'form-control'
+          .form-group
+            = form.label :relation_with_guardian, 'Relation With Guardian', class: 'required'
+            %select.form-control{ id: 'relation_with_guardian', name: 'relation_with_guardian', style: 'font-size: 16px;' }
+              %option{ value: 'father' } Father
+              %option{ value: 'mother' } Mother
+              %option{ value: 'wife' } Wife
+              %option{ value: 'husband' } Husband
+              %option{ value: 'brother' } Brother
+              %option{ value: 'sister' } Sister
+          .form-group
+            = form.label :guardian_occupation, 'Guardian Occupation', class: 'required'
+            = form.select :guardian_occupation, [['Self Employed/Business', 'Self Employed/Business'], ['Private Sector Job', 'Private Sector Job'], ['Public Sector Job', 'Public Sector Job'], ['Retired', 'Retired'], ['Home Maker', 'Home Maker'], ['Factory Worker', 'Factory Worker'], ['Academic', 'Academic'], ['Unemployed', 'Unemployed'], ['Other', 'Other']], {}, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :dob, 'Date of Birth (YYYY-MM-DD)', class: 'required'
+            = form.text_field :dob, required: true, pattern: '\d{4}-\d{2}-\d{2}', class: 'form-control'
+          .form-group
+            = form.label :pan_number, 'PAN Number (A-Z0-9)', class: 'required'
+            = form.text_field :pan_number, required: true, pattern: '[A-Z0-9]{10}', class: 'form-control'
+          .form-group
+            = form.label :mobile, 'Mobile (10 digits)', class: 'required'
+            = form.text_field :mobile, required: true, pattern: '\d{10}', class: 'form-control'
+          .form-group
+            = form.label :email, 'Email', class: 'required'
+            = form.text_field :email, required: true, pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', class: 'form-control'
+          .form-group
+            = form.label :gender, 'Gender', class: 'required'
+            %div{style: "display: flex; gap: 3px;"}
+              = form.radio_button :gender, 'Male'
+              %label{style: "margin-right: 5px; font-size: 16px;"} Male
+              = form.radio_button :gender, 'Female'
+              %label{style: "margin-right: 5px; font-size: 16px;"} Female
+              = form.radio_button :gender, 'Other'
+              %label Other
+          .form-group
+            = form.label :occupation_category, 'Occupation Category', class: 'required'
+            %select.form-control{ id: 'occupation_category', name: 'occupation_category', style: 'font-size: 16px;' }
+              %option{ value: 'kirana' } Kirana/Groceries/General Store
+              %option{ value: 'electronics' } Electronics/E-commerce/Mobile Accessories/Telecom
+              %option{ value: 'pharmacy' } Pharmacy/Medical
+              %option{ value: 'salon' } Salon/Cosmetics/Beauty Parlor/Fitness
+              %option{ value: 'apparels' } Apparels/Clothing/Boutique/Garments/Tailoring/Footwear
+              %option{ value: 'restaurant' } Restaurant/Food
+              %option{ value: 'others' } Others
+            %div{id: 'other-occupation', style: 'display: none;'}
+              = form.label :other_occupation, 'Other Occupation Category', class: 'required'
+              = form.text_field :other_occupation, class: 'form-control'
+          .form-group
+            = form.label :business_type, 'Business Type', class: 'required'
+            = form.select :business_type, options_for_select([['Seller-Retailer', 'Seller-Retailer'], ['Seller-Wholesale', 'Seller-Wholesale'], ['agri-dairy value chain', 'agri-dairy value chain']]), {}, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :monthly_income, 'Monthly Income (Numeric)', class: 'required'
+            = form.text_field :monthly_income, required: true, pattern: '\d+'
+          .form-group
+            = form.label :type_of_loan, 'Type of Business Loan', class: 'required'
+            - ['Small Value Business Loan (50k - 2L)', 'High Value Business loan (2L - 7L)'].each do |loan_type|
+              %div{style: "margin-bottom: 5px;"}
+                = form.radio_button :type_of_loan, loan_type
+                = loan_type
+          .form-group
+            = form.label :is_owned_customer_shop_type, 'You are the owner of the shop?'
+            = form.select :is_owned_customer_shop_type, [['Yes', 'true'], ['No', 'false']], {}, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :education_level, 'Education Level', class: 'required'
+            = form.select :education_level, [['None', 'None'], ['Primary', 'Primary'], ['Upto 9th', 'Upto 9th'], ['High School', 'High School'], ['Intermediate', 'Intermediate'], ['Graduate', 'Graduate'], ['Post Graduate', 'Post Graduate']], {}, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :insurance, 'Insurance', class: 'required'
+            = form.select :insurance, [['Health', 'Health'], ['Life', 'Life'], ['Accidental', 'Accidental'], ['Govt', 'Govt'], ['None', 'None']], {}, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :shop_road_type, 'Shop Road Type', class: 'required'
+            = form.select :shop_road_type, [['Highway', 'Highway'], ['Street', 'Street'], ['Market', 'Market'], ['Village', 'Village']], {}, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :home_address, 'Home Address (House No, Street)', class: 'required'
+            = form.text_field :home_address, required: true
+          .form-group
+            = form.label :home_city, 'Home City', class: 'required'
+            = form.text_field :home_city, required: true
+          .form-group
+            = form.label :home_state, 'Home State', class: 'required'
+            = form.select :home_state, options_for_select(@state_codes), {}, required: true, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :home_pincode, 'Home Pincode (6 digits)', class: 'required'
+            = form.text_field :home_pincode, required: true, pattern: '\d{6}'
+          .form-group
+            = form.label :business_address, 'Business Address (Shop No, Street)', class: 'required'
+            = form.text_field :business_address
+          .form-group
+            = form.label :business_city, 'Business City', class: 'required'
+            = form.text_field :business_city, required: true
+          .form-group
+            = form.label :business_state, 'Business State', class: 'required'
+            = form.select :business_state, options_for_select(@state_codes), {}, required: true, class: 'form-control', style: 'font-size: 16px;'
+          .form-group
+            = form.label :business_pincode, 'Business Pincode (6 digits)', class: 'required'
+            = form.text_field :business_pincode, required: true, pattern: '\d{6}'
+          .form-group
+            = form.submit 'Submit Details', id: 'submit-button', class: 'btn btn-primary'
+
+        %p.terms-and-conditions
+          %strong{style: "text-decoration: underline;"} Terms and Conditions
+          %br
+          We would like to inform you that the following information has been provided by you as per your discussion with Tide (Tide Platform Private Limited) regarding your loan request. Your information will be shared with their partner Happy and its lending institution, subject to approval. The lending institution will get in touch with you to meet your requirements.
+          We prioritize your privacy and are committed to safeguarding your information. Rest assured, we will only use your details to assess your loan eligibility. Please provide accurate details to ensure the efficient processing of your loan application. By proceeding, you hereby give your consent to share this information.
+
+        .success-message-overlay#success-message-overlay
+          %div{id: 'success-message-text'}
+          %a{href: '/onboard'} New
+          |
+          %span
+            %a{href: '/user_login'} Login
+
+        :javascript
+          document.addEventListener('DOMContentLoaded', function() {
+            var lat = '';
+            var long = '';
+            var accuracy = '';
+            var videoElements = document.querySelectorAll('#video-element');
+            var captureButtons = document.querySelectorAll('.capture-button');
+            var capturedCanvases = document.querySelectorAll('.captured-image');
+            var imageCaptures = [];
+            var capturedPhotoDatas = [];
+            var occupationSelect = document.getElementById('occupation_category');
+            var otherOccupationDiv = document.getElementById('other-occupation');
+            var otherOccupationInput = document.querySelector('#other-occupation input');
+            var compressorScript = document.createElement('script');
+            compressorScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.0.5/compressor.min.js';
+            document.head.appendChild(compressorScript);
+
+            occupationSelect.addEventListener('change', function() {
+              if (occupationSelect.value === 'others') {
+                otherOccupationDiv.style.display = 'block';
+                otherOccupationInput.setAttribute('required', 'required');
+              } else {
+                otherOccupationDiv.style.display = 'none';
+                otherOccupationInput.removeAttribute('required');
+                if (occupationSelect.value !== '') {
+                  form.elements['occupation_category'].value = occupationSelect.value;
+                }
+              }
+            });
+
+            navigator.geolocation.getCurrentPosition(function succ(pos){
+              var crd = pos.coords;
+              lat = crd.latitude;
+              long = crd.longitude;
+              accuracy = crd.accuracy;
+            }, function err(err){
+              console.log('ERROR(' + err.code + '): ' + err.message);
+            });
+
+            function onGetUserMediaButtonClick(type) {
+              navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(mediaStream) {
+                  videoElements[type].srcObject = mediaStream;
+                  imageCaptures[type] = new ImageCapture(mediaStream.getVideoTracks()[0]);
+                  captureButtons[type].disabled = false;
+                  captureButtons[type].addEventListener('click', function() { onTakePhotoButtonClick(type); });
+                  videoElements[type].style.display = 'block';
+                })
+                .catch(function(error) { console.error('Error getting user media:', error); });
+            }
+            var imageCaptured = [false, false];
+            function onTakePhotoButtonClick(type) {
+              imageCaptures[type].takePhoto()
+                .then(function(blob) {
+                  var reader = new FileReader();
+                  reader.readAsDataURL(blob);
+                  reader.onloadend = function () {
+                    var base64data = reader.result;
+                    capturedPhotoDatas[type] = base64data; 
+                    imageCaptured[type] = true;
+                  };
+                  createImageBitmap(blob)
+                    .then(function(imageBitmap) {
+                      var aspectRatio = imageBitmap.width / imageBitmap.height;
+                      var parentWidth = capturedCanvases[type].parentNode.offsetWidth;
+                      var widthPercentage = 50;
+                      var newWidth = parentWidth * (widthPercentage / 100);
+                      var newHeight = newWidth / aspectRatio;
+
+                      if (aspectRatio > 1) {
+                        newHeight = Math.round(newWidth / aspectRatio);
+                      } else {
+                        newWidth = Math.round(newHeight * aspectRatio);
+                      }
+
+                      capturedCanvases[type].width = newWidth;
+                      capturedCanvases[type].height = newHeight;
+                      var context = capturedCanvases[type].getContext('2d');
+                      context.drawImage(imageBitmap, 0, 0, newWidth, newHeight);
+                      capturedCanvases[type].style.display = 'flex';
+                      videoElements[type].style.display = 'none';
+                      mediaStream.getVideoTracks()[0].stop();
+                    });
+                })
+                .catch(function(error) { console.error('Error taking photo:', error); });
+            }
+
+            captureButtons.forEach(function(button, index) {
+              button.addEventListener('click', function() { onGetUserMediaButtonClick(index); });
+            });
+
+            function showSuccessMessageOverlay(message) {
+              var successMessageText = document.getElementById('success-message-text');
+              successMessageText.innerHTML = '<p style="font-weight: bold; color: red;">' + message + '</p>';
+              document.getElementById('success-message-overlay').style.display = 'block';
+              document.getElementById('container').style.display = 'none';
+              form.reset();
+              capturedPhotoDatas = [];
+            }
+
+            function hideSuccessMessageOverlay() {
+              document.getElementById('success-message-overlay').style.display = 'none';
+              document.getElementById('container').style.display = 'block'; 
+            }
+
+            var form = document.getElementById('new_customer_lead_form');
+            form.addEventListener('submit', async function(event) {
+              event.preventDefault();
+              if (!lat || !long) {
+                alert('Please refresh the page and allow to access location.');
+                return;
+              }
+              if (!imageCaptured[0] || !imageCaptured[1]) {
+                alert('Please capture both images before submitting the form.');
+                return;
+              }
+              var formData = new FormData(form);
+              formData.append('latitude', lat);
+              formData.append('longitude', long);
+              formData.append('accuracy', accuracy);
+
+              const response = await fetch(form.action, {
+                method: form.method,
+                body: formData
+              });
+              const data = await response.json();
+              const base64Selfie = capturedPhotoDatas[0].split(',')[1];
+              const base64ShopPhoto = capturedPhotoDatas[1].split(',')[1];
+
+              const compressedSelfie = await compressImage(base64Selfie);
+              const compressedShopPhoto = await compressImage(base64ShopPhoto);
+
+              uploadImageToS3('selfie', compressedSelfie, data.id);
+              uploadImageToS3('shop_photo', compressedShopPhoto, data.id);
+
+              form.reset();
+              capturedPhotoDatas = [];
+              capturedCanvases.forEach(function(canvas) {
+                var context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                canvas.style.display = 'none';
+              });
+              showSuccessMessageOverlay(data.message);
+
+              captureButtons.forEach(function(button, index) {
+                button.disabled = false;
+                videoElements[index].style.display = 'none';
+                capturedCanvases[index].style.display = 'none';
+              });
+            });
+            
+            async function uploadImageToS3(imageKey, base64data, id) {
+                fetch('/upload_image_to_s3', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        imageKey: imageKey,
+                        base64data: base64data,
+                        id: id
+                    })
+                });
+            }
+            async function compressImage(base64Image) {
+              var image = new Image();
+              image.src = 'data:image/jpeg;base64,' + base64Image;
+
+              return new Promise(function(resolve, reject) {
+                image.onload = function() {
+                  var canvas = document.createElement('canvas');
+                  var ctx = canvas.getContext('2d');
+
+                  canvas.width = image.width;
+                  canvas.height = image.height;
+
+                  ctx.drawImage(image, 0, 0, image.width, image.height);
+
+                  canvas.toBlob(
+                    function(blob) {
+                      var reader = new FileReader();
+                      reader.readAsDataURL(blob);
+                      reader.onloadend = function() {
+                        resolve(reader.result.split(',')[1]);
+                      };
+                    },
+                    'image/jpeg',
+                    0.7 
+                  );
+                };
+
+                image.onerror = function() {
+                  reject(new Error('Failed to load image'));
+                };
+              });
+            }
+
+            var onboardNewButton = document.querySelector('#success-message-overlay a[href="/onboard"]');
+            onboardNewButton.addEventListener('click', function(event) {
+              event.preventDefault();
+              window.location.reload();
+              hideSuccessMessageOverlay();
+              window.location.href = '/onboard';
+            });
+
+            var partnerLoginButton = document.querySelector('#success-message-overlay a[href="/user_login"]');
+            partnerLoginButton.addEventListener('click', function(event) {
+              event.preventDefault();
+              window.location.href = '/user_login';
+              hideSuccessMessageOverlay();
+              console.log('Clicked on partner login button'); 
+            });
+          });

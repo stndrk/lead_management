@@ -1,0 +1,244 @@
+!!!
+%html
+  %head
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title Customer Leads
+    :css
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f8f8;
+        margin: 0;
+        padding: 0;
+      }
+      .list-view-border {
+        overflow: hidden;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0,0.4);
+        padding-top: 60px;
+        }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      table {
+        margin: 0;
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th{
+        background-color: pink;
+        font-size: 1rem;
+        font-weight: bold;
+        letter-spacing: 0.00875rem;
+        padding: 0;
+        height: 40px;
+      }
+
+      td {
+        color: black;
+        font-size: 1rem;
+        font-weight: 400;
+        letter-spacing: 0.01rem;
+        padding: 0;
+        height: 30px;
+      }
+       
+      .list-daa {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .table-data-style{
+        text-align: center;
+      }
+
+      filter-options {
+        margin-bottom: 10px;
+      }
+
+      table, th, td {
+        border: 3px solid;
+      }
+      .top_nav{
+        display: flex;
+        justify-content: space-between;
+        background-color:#1e1e2d;
+        color:#c0c4d1;
+        height:70px;
+        font-size: 1rem;
+        font-weight:500;
+        align-items:center;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .user-label {
+        color: #f8f9fa; 
+        font-weight: bold;
+        margin-left: 5px; 
+        margin-right: 10px; 
+      }
+      .pagination{
+        margin-top: 0.1rem;
+        margin-right: 10px; 
+      }
+      .digg_pagination {
+        background: #f8f8f8;
+        cursor: default;
+        text-align: right; 
+        font-weight: bold; 
+        margin-top: 0.3rem;
+        margin-right: 10px; 
+        }
+      .digg_pagination a, .digg_pagination span, .digg_pagination em {
+        padding: 0.2em 0.5em;
+        display: inline-block;}
+
+      .digg_pagination .disabled {
+        color: #999999;
+        border: 3px solid #dddddd; }
+      .digg_pagination .current {
+        font-style: normal;
+        font-weight: bold;
+        background: #2e6ab1;
+        color: white;
+        border: 3px solid #2e6ab1; }
+      .digg_pagination a {
+        text-decoration: none;
+        color: #105cb6;
+        border: 3px solid #9aafe5; }
+      .digg_pagination a:hover, .digg_pagination a:focus {
+        color: #000033;
+        border-color: #000033; }
+      .digg_pagination .page_info {
+        background: #2e6ab1;
+        color: white;
+        padding: 0.4em 0.6em;
+        width: 22em;
+        margin-bottom: 0.3em;
+        text-align: center; }
+      .digg_pagination .page_info b {
+        color: #000033;
+        background: #6aa6ed;
+        padding: 0.1em 0.25em; }
+      .digg_pagination:after {
+        content: ".";
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden; }
+        * html .digg_pagination {
+        height: 1%; }
+        *:first-child + html .digg_pagination {
+        overflow: hidden; }
+
+  %body
+    :javascript
+      function filterCustomers(event) {
+        event.preventDefault();
+        var filterValue = document.getElementById('filter').value;
+
+        fetch(`/customers/${filterValue}`)
+          .then(response => response.json())
+          .then(data => {
+            var tableBody = document.getElementById('customer-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            data.forEach(customer => {
+              var row = tableBody.insertRow();
+              row.insertCell().textContent = customer.id;
+              row.insertCell().textContent = `${customer.first_name} ${customer.last_name}`;
+              row.insertCell().textContent = customer.status;
+              row.insertCell().textContent = customer.mobile;
+              row.insertCell().textContent = customer.offered_amount;
+              row.insertCell().textContent = new Date(customer.created_at).toISOString().split('T')[0];
+              row.insertCell().textContent = customer.rejection_reason;
+            });
+          })
+          .catch(error => console.error('Error:', error));
+      }
+
+      function toggleLogout() {
+        var logoutButton = document.getElementById('logout-button');
+        var logoutButtonLink = document.getElementById('logout-button-link');
+
+        if (logoutButton.style.display === 'none' && logoutButtonLink.style.display === 'none') {
+          logoutButton.style.display = 'inline';
+          logoutButtonLink.style.display = 'inline';
+        } else {
+          logoutButton.style.display = 'none';
+          logoutButtonLink.style.display = 'none';
+        }
+      }
+
+    .top_nav
+      = image_tag('happy-logo-light.png')
+      .user-labels
+        %label.user-label= link_to 'Onboard', '/onboard', style: "color: blue;"
+        - if current_user
+          %label#user-label.user-label{onclick: "toggleLogout()"}
+            Hi! #{current_user.name}
+          %label#logout-button.user-label{style: "display: none;"}= link_to 'Logout', '/logout', style: "color: blue;", id: "logout-button-link"
+        - else
+          %label.user-label Hello!
+    %div.container{style: "display: flex; justify-content: space-between; align-items: center;"}
+      %h1 Loans | List
+      %div#filter-options{style: "margin-left: auto; margin-right: 30px;"}
+        %label{for: "filter"} Filter:
+        %input#filter{type: "text", placeholder: "Mobile, or Loan UID", name: "filter", style: "font-weight: bold;"}
+        %button{onclick: "filterCustomers(event)", id: "filter-button", style: "font-weight: bold;"} Submit
+    .list-view-border
+      %table.table{id: "customer-table"}
+        %thead
+          %tr
+            %th ID
+            %th Name
+            %th Status
+            %th Mobile
+            %th Loan Amount
+            %th Onboard At
+            %th Rejection Reason
+        %tbody
+          - @customers.each do |customer|
+            %tr
+              %td.table-data-style= customer.id
+              %td.table-data-style= "#{customer.first_name} #{customer.last_name}"
+              %td.table-data-style= customer.status
+              %td.table-data-style= customer.mobile
+              %td.table-data-style= customer.offered_amount
+              %td.table-data-style= customer.created_at.strftime('%Y-%m-%d')
+              %td.table-data-style= customer.rejection_reason
+
+      %div.text-center.my-4
+        %div{role: "navigation", "aria-label": "Pagination", class: "px-3 py-4 mx-2 text-gray-700 no-underline bg-white rounded-lg"}
+          %div{class: "digg_pagination"}
+            %div.py-4
+              = page_entries_info @customers
+            %div.py-4
+              = paginate @customers
